@@ -57,3 +57,8 @@ Route::middleware(['auth', 'role:'.implode('|', config('donor.officer_roles'))])
             ->except(['show'])
             ->names('petugas.donasi');
     });
+
+// PBI-09: Riwayat donasi & tanggal boleh donor berikutnya (portal pendonor)
+Route::middleware(['auth', 'role:'.config('donor.donor_role')])
+    ->get('/pendonor/riwayat', [\App\Http\Controllers\Pendonor\DonorHistoryController::class, 'index'])
+    ->name('pendonor.riwayat');
