@@ -47,3 +47,13 @@ Route::middleware(['auth', 'role:admin_pmi'])->prefix('admin')->group(function (
     Route::put('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::patch('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
 });
+
+// PBI-09: Pencatatan donasi oleh petugas bank darah
+Route::middleware(['auth', 'role:'.implode('|', config('donor.officer_roles'))])
+    ->prefix('petugas')
+    ->group(function () {
+        Route::resource('donasi', \App\Http\Controllers\Petugas\DonationController::class)
+            ->parameters(['donasi' => 'donation'])
+            ->except(['show'])
+            ->names('petugas.donasi');
+    });
