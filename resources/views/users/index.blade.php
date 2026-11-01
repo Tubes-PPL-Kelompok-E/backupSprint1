@@ -13,6 +13,12 @@
             <option value="{{ $r }}" @selected(request('role') === $r)>{{ $r }}</option>
         @endforeach
     </select>
+    <select name="instansi" class="border rounded px-3 py-2 text-sm">
+        <option value="">Semua instansi</option>
+        @foreach ($daftarInstansi as $i)
+            <option value="{{ $i }}" @selected(request('instansi') === $i)>{{ $i }}</option>
+        @endforeach
+    </select>
     <button class="bg-gray-800 text-white text-sm rounded px-4">Cari</button>
 </form>
 

@@ -48,6 +48,20 @@ class UserSeeder extends Seeder
             ],
         ];
 
+<<<<<<< HEAD
+        foreach ($data as [$name, $email, $instansi, $role]) {
+            // withTrashed: akun nonaktif tetap ditemukan lalu diaktifkan kembali
+            $user = User::withTrashed()->firstOrCreate(
+                ['email' => $email],
+                ['name' => $name, 'instansi' => $instansi, 'password' => 'password123']
+            );
+
+            if ($user->trashed()) {
+                $user->restore();
+            }
+
+            $user->syncRoles([$role]);
+=======
         foreach ($users as $userData) {
             $user = User::firstOrCreate(
                 ['email' => $userData['email']],
@@ -62,6 +76,7 @@ class UserSeeder extends Seeder
             );
 
             $user->syncRoles($userData['roles']);
+>>>>>>> 97273f945f0e085eb6ccceff1bb4058df17dfc78
         }
     }
 }

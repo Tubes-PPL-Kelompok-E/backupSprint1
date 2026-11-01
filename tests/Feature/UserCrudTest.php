@@ -64,6 +64,16 @@ class UserCrudTest extends TestCase
         $this->get('/admin/users?q=budi')->assertOk()->assertSee('Budi');
     }
 
+    public function test_filter_daftar_akun_berdasarkan_peran_dan_instansi(): void
+    {
+        $this->post('/admin/users', $this->payload());
+        $this->post('/admin/users', $this->payload(['name' => 'Andi', 'email' => 'andi@test.id', 'role' => 'pendonor', 'instansi' => 'Universitas']));
+
+        $this->get('/admin/users?role=petugas_rs')->assertSee('budi@test.id')->assertDontSee('andi@test.id');
+        $this->get('/admin/users?instansi=Universitas')->assertSee('andi@test.id')->assertDontSee('budi@test.id');
+        $this->get('/admin/users?role=pendonor&instansi=RSUD')->assertDontSee('andi@test.id')->assertDontSee('budi@test.id');
+    }
+
     public function test_update_peran_dan_instansi(): void
     {
         $this->post('/admin/users', $this->payload());

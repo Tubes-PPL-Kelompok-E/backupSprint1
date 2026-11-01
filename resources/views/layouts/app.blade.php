@@ -17,6 +17,7 @@
 
     // Menu navigasi per peran (route yang belum ada diisi '#')
     $portal = match (true) {
+        $user->hasRole('admin_pmi')  => 'Supply Chain System',
         $user->hasRole('admin_pmi')  => 'Admin Portal',
         $user->hasRole('petugas_rs') => 'Petugas RS Portal',
         default                      => 'Donor Portal',
@@ -25,6 +26,10 @@
     $menus = match (true) {
         $user->hasRole('admin_pmi') => [
             ['Dashboard', route('admin.dashboard'), request()->routeIs('admin.dashboard')],
+            ['Stok Darah', route('admin.stok'), request()->routeIs('admin.stok', 'admin.kantong.*', 'admin.uji-saring*')],
+            ['Permintaan RS', route('admin.permintaan'), request()->routeIs('admin.permintaan*')],
+            ['Laporan', route('admin.laporan'), request()->routeIs('admin.laporan')],
+            ['Kegiatan Donor', route('admin.kegiatan'), request()->routeIs('admin.kegiatan')],
             ['Manajemen Akun', route('users.index'), request()->routeIs('users.*')],
         ],
         $user->hasRole('petugas_rs') => [
@@ -82,6 +87,10 @@
                         <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
                         <p class="text-[11px] text-red-600 font-semibold mt-1">{{ $user->getRoleNames()->first() }}</p>
                     </div>
+                    @role('admin_pmi')
+                        <a href="{{ route('users.index') }}" class="block px-4 py-3 text-sm hover:bg-gray-50">Kelola Akun</a>
+                        <a href="{{ route('instansi.index') }}" class="block px-4 py-3 text-sm hover:bg-gray-50">Data Instansi</a>
+                    @endrole
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="w-full text-left px-4 py-3 text-sm text-red-600 font-semibold hover:bg-red-50">Keluar</button>

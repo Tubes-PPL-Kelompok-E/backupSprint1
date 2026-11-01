@@ -14,6 +14,8 @@
 <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden">
     <div class="bg-red-700 text-white text-center py-7 px-6">
         <div class="mx-auto mb-3 w-10 h-10 rounded-full bg-white text-red-700 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c3.2 4.2 6 7.4 6 11a6 6 0 0 1-12 0c0-3.6 2.8-6.8 6-11z"/></svg>
+        </div>
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c3.2 4.2 6 7.4 6 11a6 6 0 0 1-12 0c0-3.6 2.8-6.8 6-11z"/></svg>
 </div>
         <h1 class="text-xl font-bold">BloodConnect</h1>
@@ -52,7 +54,7 @@
         <div>
             <div class="flex justify-between mb-1">
                 <label class="text-xs font-semibold text-gray-700">Kata Sandi</label>
-                <a href="#" class="text-xs font-semibold text-red-600">Lupa Password?</a>
+                <a href="{{ route('password.request') }}" class="text-xs font-semibold text-red-600">Lupa Password?</a>
             </div>
             <input type="password" name="password" required placeholder="••••••••"
                    class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
