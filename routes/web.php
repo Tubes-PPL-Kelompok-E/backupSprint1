@@ -21,11 +21,12 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('login.attempt');
 
-    // Registrasi pendonor (dibatasi 5 percobaan per menit per IP)
+    // Registrasi (dibatasi 5 percobaan per menit per IP)
     Route::get('/register', [RegisterController::class, 'show'])->name('register');
     Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:5,1')->name('register.store');
 
     // Lupa kata sandi (nama route 'password.reset' wajib untuk email bawaan Laravel)
+    // Lupa kata sandi
     Route::get('/forgot-password', [ForgotPasswordController::class, 'show'])->name('password.request');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'send'])->middleware('throttle:5,1')->name('password.email');
     Route::get('/reset-password/{token}', [ResetPasswordController::class, 'show'])->name('password.reset');
@@ -75,3 +76,18 @@ Route::middleware(['auth', 'role:admin_pmi'])->prefix('admin')->group(function (
     Route::put('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::patch('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
 });
+
+// PBI-09: Pencatatan donasi oleh petugas bank darah
+Route::middleware(['auth', 'role:'.implode('|', config('donor.officer_roles'))])
+    ->prefix('petugas')
+    ->group(function () {
+        Route::resource('donasi', \App\Http\Controllers\Petugas\DonationController::class)
+            ->parameters(['donasi' => 'donation'])
+            ->except(['show'])
+            ->names('petugas.donasi');
+    });
+
+// PBI-09: Riwayat donasi & tanggal boleh donor berikutnya (portal pendonor)
+Route::middleware(['auth', 'role:'.config('donor.donor_role')])
+    ->get('/pendonor/riwayat', [\App\Http\Controllers\Pendonor\DonorHistoryController::class, 'index'])
+    ->name('pendonor.riwayat');

@@ -18,6 +18,7 @@
     // Menu navigasi per peran (route yang belum ada diisi '#')
     $portal = match (true) {
         $user->hasRole('admin_pmi')  => 'Supply Chain System',
+        $user->hasRole('admin_pmi')  => 'Admin Portal',
         $user->hasRole('petugas_rs') => 'Petugas RS Portal',
         default                      => 'Donor Portal',
     };
@@ -29,6 +30,7 @@
             ['Permintaan RS', route('admin.permintaan'), request()->routeIs('admin.permintaan*')],
             ['Laporan', route('admin.laporan'), request()->routeIs('admin.laporan')],
             ['Kegiatan Donor', route('admin.kegiatan'), request()->routeIs('admin.kegiatan')],
+            ['Manajemen Akun', route('users.index'), request()->routeIs('users.*')],
         ],
         $user->hasRole('petugas_rs') => [
             ['Dashboard', route('petugas.dashboard'), request()->routeIs('petugas.dashboard')],
