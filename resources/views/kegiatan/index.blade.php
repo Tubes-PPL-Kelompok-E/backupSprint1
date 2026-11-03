@@ -12,7 +12,7 @@
             <a href="{{ route('kegiatan-donor.create') }}" class="kd-btn">+ Buat Kegiatan Donor</a>
         </div>
 
-        @if (session('success')) <div class="kd-alert kd-alert-success">{{ session('success') }}</div> @endif
+    
         @if (session('error'))   <div class="kd-alert kd-alert-error">{{ session('error') }}</div>   @endif
 
         <div class="kd-grid">
