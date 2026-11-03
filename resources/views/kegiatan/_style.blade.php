@@ -2,7 +2,6 @@
     .kd-wrap { max-width: 760px; margin: 32px auto; padding: 0 16px; }
     .kd-wrap.kd-wide { max-width: 1100px; }
     .kd-card { background: #fff; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 28px; }
-    .kd-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
     .kd-title { font-size: 22px; font-weight: 700; color: #1f2937; margin: 0; }
     .kd-sub { color: #6b7280; font-size: 14px; margin: 4px 0 24px; }
 
@@ -35,17 +34,22 @@
     .kd-alert-success { background: #ecfdf5; color: #065f46; }
     .kd-alert-error { background: #fef2f2; color: #991b1b; }
 
-    .kd-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .kd-table th { text-align: left; color: #6b7280; font-weight: 600; padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }
-    .kd-table td { padding: 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
-    .kd-table .kd-aksi { display: flex; gap: 6px; flex-wrap: wrap; }
-    .kd-table-scroll { overflow-x: auto; }
-
     .kd-badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
     .kd-badge-terbuka { background: #dcfce7; color: #166534; }
     .kd-badge-ditutup { background: #e5e7eb; color: #374151; }
 
-    .kd-detail { display: grid; grid-template-columns: 160px 1fr; gap: 10px 16px; font-size: 15px; }
+    .kd-head-card { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+    .kd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .kd-event { background: #fff; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .kd-event-top { display: flex; justify-content: space-between; align-items: center; }
+    .kd-event-title { font-size: 16px; font-weight: 700; color: #111827; margin: 4px 0; }
+    .kd-time { font-size: 13px; color: #6b7280; }
+    .kd-meta { font-size: 13px; color: #4b5563; }
+    .kd-event-foot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f3f4f6; margin-top: 8px; padding-top: 12px; font-size: 13px; color: #6b7280; }
+    .kd-red { color: #dc2626; }
+    .kd-event-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+
+    .kd-detail { display: grid; grid-template-columns: 160px 1fr; gap: 10px 16px; font-size: 15px; margin: 0; }
     .kd-detail dt { color: #6b7280; font-weight: 600; }
     .kd-detail dd { margin: 0; color: #111827; }
 
