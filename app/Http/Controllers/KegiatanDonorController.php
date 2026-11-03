@@ -13,8 +13,11 @@ class KegiatanDonorController extends Controller
      */
     public function index()
     {
-        //
+    $kegiatan = KegiatanDonor::orderByDesc('tanggal')->paginate(9);
+
+    return view('kegiatan.index', compact('kegiatan'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -38,9 +41,9 @@ public function store(KegiatanDonorRequest $request)
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+   public function show(KegiatanDonor $kegiatan)
     {
-        //
+    return view('kegiatan.show', compact('kegiatan'));
     }
 
     /**

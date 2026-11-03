@@ -26,6 +26,7 @@
         $user->hasRole('admin_pmi') => [
             ['Dashboard', route('admin.dashboard'), request()->routeIs('admin.dashboard')],
             ['Manajemen Akun', route('users.index'), request()->routeIs('users.*')],
+            ['Kegiatan Donor', route('kegiatan-donor.index'), request()->routeIs('kegiatan-donor.*')],
         ],
         $user->hasRole('petugas_rs') => [
             ['Dashboard', route('petugas.dashboard'), request()->routeIs('petugas.dashboard')],
