@@ -52,6 +52,8 @@ Route::middleware(['auth', 'role:admin_pmi'])->prefix('admin')->group(function (
 Route::middleware(['auth', 'role:admin_pmi'])->prefix('admin')->group(function () {
     Route::patch('kegiatan-donor/{kegiatan}/tutup', [KegiatanDonorController::class, 'tutup'])
         ->name('kegiatan-donor.tutup');
+    Route::patch('kegiatan-donor/{kegiatan}/buka', [KegiatanDonorController::class, 'buka'])
+    ->name('kegiatan-donor.buka');
 
     Route::resource('kegiatan-donor', KegiatanDonorController::class)
         ->parameters(['kegiatan-donor' => 'kegiatan']);

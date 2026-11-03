@@ -5,7 +5,7 @@
 
     <div class="kd-wrap">
         <div class="kd-card">
-            @if (session('success')) <div class="kd-alert kd-alert-success">{{ session('success') }}</div> @endif
+           
             @if (session('error'))   <div class="kd-alert kd-alert-error">{{ session('error') }}</div>   @endif
 
             <div class="kd-event-top" style="margin-bottom:12px">
@@ -29,7 +29,23 @@
             </dl>
 
             <div class="kd-actions">
-                {{-- tombol Ubah dan Tutup ditambahkan di DARAH-89 --}}
+                <a href="{{ route('kegiatan-donor.edit', $kegiatan) }}" class="kd-btn">Ubah</a>
+
+                @if ($kegiatan->status === 'Terbuka')
+                <form action="{{ route('kegiatan-donor.tutup', $kegiatan) }}" method="POST"
+                    onsubmit="return confirm('Tutup kegiatan ini?')">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="kd-btn kd-btn-outline">Tutup Kegiatan</button>
+                </form>
+                @else
+                <form action="{{ route('kegiatan-donor.buka', $kegiatan) }}" method="POST"
+                    onsubmit="return confirm('Buka kembali kegiatan ini?')">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="kd-btn kd-btn-outline">Buka Kembali</button>
+                </form>
+                @endif
                 <a href="{{ route('kegiatan-donor.index') }}" class="kd-btn kd-btn-outline">Kembali</a>
             </div>
         </div>

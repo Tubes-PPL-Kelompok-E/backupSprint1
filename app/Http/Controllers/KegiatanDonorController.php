@@ -41,25 +41,36 @@ public function store(KegiatanDonorRequest $request)
     /**
      * Display the specified resource.
      */
-   public function show(KegiatanDonor $kegiatan)
+    public function show(KegiatanDonor $kegiatan)
     {
     return view('kegiatan.show', compact('kegiatan'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(KegiatanDonor $kegiatan)
     {
-        //
+    return view('kegiatan.edit', compact('kegiatan'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(KegiatanDonorRequest $request, KegiatanDonor $kegiatan)
     {
-        //
+    $kegiatan->update($request->validated());
+
+    return redirect()->route('kegiatan-donor.show', $kegiatan)
+        ->with('success', 'Kegiatan donor berhasil diperbarui.');
+    }
+
+    public function tutup(KegiatanDonor $kegiatan)
+    {
+    $kegiatan->update(['status' => 'Ditutup']);
+
+    return back()->with('success', 'Kegiatan donor berhasil ditutup.');
+    }
+
+    public function buka(KegiatanDonor $kegiatan)
+    {
+    $kegiatan->update(['status' => 'Terbuka']);
+
+    return back()->with('success', 'Kegiatan donor dibuka kembali.');
     }
 
     /**

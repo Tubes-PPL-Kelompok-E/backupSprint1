@@ -40,7 +40,26 @@
 
                     <div class="kd-event-actions">
                         <a href="{{ route('kegiatan-donor.show', $k) }}" class="kd-btn kd-btn-outline kd-btn-sm">Detail</a>
-                        {{-- tombol Ubah, Tutup, Hapus ditambahkan di DARAH-89 dan DARAH-90 --}}
+
+                        <a href="{{ route('kegiatan-donor.edit', $k) }}" class="kd-btn kd-btn-outline kd-btn-sm">Ubah</a>
+
+                        @if ($k->status === 'Terbuka')
+                            <form action="{{ route('kegiatan-donor.tutup', $k) }}" method="POST"
+                                onsubmit="return confirm('Tutup kegiatan ini? Pendonor tidak bisa mendaftar lagi.')">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="kd-btn kd-btn-outline kd-btn-sm">Tutup</button>
+                            </form>
+                            @else
+                            <form action="{{ route('kegiatan-donor.buka', $k) }}" method="POST"
+                                onsubmit="return confirm('Buka kembali kegiatan ini?')">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="kd-btn kd-btn-outline kd-btn-sm">Buka Kembali</button>
+                            </form>
+                        @endif
+
+                         {{-- tombol Hapus ditambahkan di DARAH-90 --}}
                     </div>
                 </div>
             @empty
