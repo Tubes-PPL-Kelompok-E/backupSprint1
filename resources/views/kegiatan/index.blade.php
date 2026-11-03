@@ -59,7 +59,12 @@
                             </form>
                         @endif
 
-                         {{-- tombol Hapus ditambahkan di DARAH-90 --}}
+                        <form action="{{ route('kegiatan-donor.destroy', $k) }}" method="POST"
+                            onsubmit="return confirm('Hapus kegiatan ini? Tindakan ini tidak dapat dibatalkan.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="kd-btn kd-btn-danger kd-btn-sm">Hapus</button>
+                        </form>
                     </div>
                 </div>
             @empty

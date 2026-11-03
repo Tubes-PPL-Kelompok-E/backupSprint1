@@ -76,8 +76,15 @@ public function store(KegiatanDonorRequest $request)
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(KegiatanDonor $kegiatan)
     {
-        //
+    if ($kegiatan->punyaPendaftar()) {
+        return back()->with('error', 'Kegiatan sudah memiliki pendaftar dan tidak dapat dihapus.');
+    }
+
+    $kegiatan->delete();
+
+    return redirect()->route('kegiatan-donor.index')
+        ->with('success', 'Kegiatan donor berhasil dihapus.');
     }
 }
