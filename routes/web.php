@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\KegiatanDonorController;
 
 Route::get('/', fn () => Auth::check()
     ? redirect()->route(Auth::user()->homeRoute())
@@ -77,6 +78,15 @@ Route::middleware(['auth', 'role:admin_pmi'])->prefix('admin')->group(function (
     Route::patch('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
 });
 
+Route::middleware(['auth', 'role:admin_pmi'])->prefix('admin')->group(function () {
+    Route::patch('kegiatan-donor/{kegiatan}/tutup', [KegiatanDonorController::class, 'tutup'])
+        ->name('kegiatan-donor.tutup');
+    Route::patch('kegiatan-donor/{kegiatan}/buka', [KegiatanDonorController::class, 'buka'])
+    ->name('kegiatan-donor.buka');
+
+    Route::resource('kegiatan-donor', KegiatanDonorController::class)
+        ->parameters(['kegiatan-donor' => 'kegiatan']);
+});
 // PBI-09: Pencatatan donasi oleh petugas bank darah
 Route::middleware(['auth', 'role:'.implode('|', config('donor.officer_roles'))])
     ->prefix('petugas')

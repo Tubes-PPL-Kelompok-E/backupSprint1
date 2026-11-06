@@ -31,6 +31,7 @@
             ['Laporan', route('admin.laporan'), request()->routeIs('admin.laporan')],
             ['Kegiatan Donor', route('admin.kegiatan'), request()->routeIs('admin.kegiatan')],
             ['Manajemen Akun', route('users.index'), request()->routeIs('users.*')],
+            ['Kegiatan Donor', route('kegiatan-donor.index'), request()->routeIs('kegiatan-donor.*')],
         ],
         $user->hasRole('petugas_rs') => [
             ['Dashboard', route('petugas.dashboard'), request()->routeIs('petugas.dashboard')],
