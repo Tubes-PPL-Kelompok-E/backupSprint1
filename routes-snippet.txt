@@ -1,0 +1,16 @@
+// 1) Tambahkan di bagian atas routes/web.php
+use App\Http\Controllers\Admin\AdminPageController;
+
+// 2) HAPUS blok lama ini (di dalam Route::middleware('auth')->group):
+//    Route::view('/admin/dashboard', 'dashboard', ['title' => 'Dashboard Admin PMI'])
+//        ->middleware('role:admin_pmi')->name('admin.dashboard');
+
+// 3) Tambahkan di dalam grup admin yang sudah ada:
+//    Route::middleware(['auth', 'role:admin_pmi'])->prefix('admin')->group(function () {
+        Route::get('dashboard', [AdminPageController::class, 'dashboard'])->name('admin.dashboard');
+        Route::get('stok-darah', [AdminPageController::class, 'stok'])->name('admin.stok');
+        Route::get('permintaan-rs', [AdminPageController::class, 'permintaan'])->name('admin.permintaan');
+        Route::get('laporan', [AdminPageController::class, 'laporan'])->name('admin.laporan');
+        Route::get('kegiatan-donor', [AdminPageController::class, 'kegiatan'])->name('admin.kegiatan');
+//        ... (route users.* tetap di sini)
+//    });

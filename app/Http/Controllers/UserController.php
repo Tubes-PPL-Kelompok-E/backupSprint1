@@ -19,11 +19,15 @@ class UserController extends Controller
                 ->where('name', 'like', "%{$s}%")
                 ->orWhere('email', 'like', "%{$s}%")))
             ->when($request->role, fn ($q, $r) => $q->role($r))
+            ->when($request->instansi, fn ($q, $i) => $q->where('instansi', $i))
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('users.index', compact('users'));
+        // Pilihan filter instansi diambil dari data akun yang ada
+        $daftarInstansi = User::withTrashed()->whereNotNull('instansi')->distinct()->orderBy('instansi')->pluck('instansi');
+
+        return view('users.index', compact('users', 'daftarInstansi'));
     }
 
     // CREATE
