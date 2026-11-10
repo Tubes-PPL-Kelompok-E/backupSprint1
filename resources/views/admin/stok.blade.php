@@ -3,7 +3,7 @@
 @php
     $statusStyle = [
         'karantina' => 'bg-amber-100 text-amber-700', 'ready' => 'bg-green-100 text-green-700',
-        'reserved' => 'bg-blue-100 text-blue-700', 'ditahan' => 'bg-red-100 text-red-700',
+        'ditahan' => 'bg-red-100 text-red-700',
         'dimusnahkan' => 'bg-gray-200 text-gray-600',
     ];
     $sel = 'rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs';
@@ -14,9 +14,10 @@
         <div>
             <h1 class="text-xl font-bold text-gray-900">Manajemen Stok Darah &amp; Urutan FEFO
                 <span class="ml-2 align-middle rounded-full bg-red-50 border border-red-200 px-2 py-0.5 text-[10px] font-semibold text-red-600">First Expired, First Out</span></h1>
-            <p class="mt-2 text-xs text-gray-500">FR-06 &amp; FR-07: Pemantauan masa simpan, urutan alokasi otomatis, dan penanganan kedaluwarsa.</p>
+            <p class="mt-2 text-xs text-gray-500">Pemantauan masa simpan, urutan alokasi otomatis, dan penanganan kedaluwarsa.</p>
         </div>
         <div class="flex gap-2">
+            <a href="{{ route('admin.lokasi') }}" class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700">Lokasi Penyimpanan</a>
             <a href="{{ route('admin.uji-saring') }}" class="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700">Uji Saring Lab</a>
             <a href="{{ route('admin.kantong.create') }}" class="rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700">+ Input Darah Masuk</a>
         </div>
@@ -73,6 +74,10 @@
                         <span class="rounded-full px-2 py-1 font-semibold {{ $statusStyle[$k->status] }}">{{ \App\Models\KantongDarah::STATUS[$k->status] }}</span>
                         @if ($k->berkas_berita_acara)
                             <a href="{{ route('admin.uji-saring.berkas', $k) }}" target="_blank" class="ml-1 text-[10px] text-blue-600 underline">BA</a>
+                        @endif
+                        @if ($k->status === 'karantina')
+                            <a href="{{ route('admin.kantong.edit', $k) }}" class="ml-1 text-[10px] text-blue-600 underline">Ubah</a>
+                            <form method="POST" action="{{ route('admin.kantong.destroy', $k) }}" class="inline" onsubmit="return confirm('Hapus kantong {{ $k->kode_batch }}?')">@csrf @method('DELETE')<button class="ml-1 text-[10px] text-red-600 underline">Hapus</button></form>
                         @endif
                     @endif
                 </td>

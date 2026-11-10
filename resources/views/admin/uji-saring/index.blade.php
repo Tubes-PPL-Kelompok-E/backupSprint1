@@ -87,6 +87,15 @@
                 </label>
             </div>
 
+            @if (($lokasi ?? collect())->isNotEmpty())
+            <div>
+                <label class="block text-xs font-semibold mb-1">Lokasi simpan <span class="font-normal text-gray-400">(bila non-reaktif)</span></label>
+                <select name="lokasi_simpan" class="{{ $in }}">
+                    @foreach ($lokasi as $l)<option value="{{ $l->nama }}" @selected(old('lokasi_simpan', 'Cold Room 1') === $l->nama) @disabled($l->penuh())>{{ $l->nama }} (sisa {{ $l->sisa() }})</option>@endforeach
+                </select>
+            </div>
+            @endif
+
             <div>
                 <label class="block text-xs font-semibold mb-1">Catatan <span class="font-normal text-gray-400">(opsional)</span></label>
                 <textarea name="catatan_uji" rows="3" placeholder="Catatan petugas laboratorium" class="{{ $in }}">{{ old('catatan_uji') }}</textarea>

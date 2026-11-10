@@ -15,36 +15,31 @@
 @php
     $user = auth()->user();
 
-    // Menu navigasi per peran (route yang belum ada diisi '#')
+    // Menu navigasi per peran
     $portal = match (true) {
         $user->hasRole('admin_pmi')  => 'Supply Chain System',
-        $user->hasRole('admin_pmi')  => 'Admin Portal',
         $user->hasRole('petugas_rs') => 'Petugas RS Portal',
         default                      => 'Donor Portal',
     };
 
     $menus = match (true) {
         $user->hasRole('admin_pmi') => [
-            ['Dashboard', route('admin.dashboard'), request()->routeIs('admin.dashboard')],
-            ['Stok Darah', route('admin.stok'), request()->routeIs('admin.stok', 'admin.kantong.*', 'admin.uji-saring*')],
-            ['Permintaan RS', route('admin.permintaan'), request()->routeIs('admin.permintaan*')],
-            ['Laporan', route('admin.laporan'), request()->routeIs('admin.laporan')],
-            ['Kegiatan Donor', route('admin.kegiatan'), request()->routeIs('admin.kegiatan')],
-            ['Manajemen Akun', route('users.index'), request()->routeIs('users.*')],
-            ['Kegiatan Donor', route('kegiatan-donor.index'), request()->routeIs('kegiatan-donor.*')],
+            ['Dashboard', route('admin.dashboard'), request()->routeIs('admin.dashboard', 'admin.batas-minimum*')],
+            ['Stok Darah', route('admin.stok'), request()->routeIs('admin.stok', 'admin.kantong.*', 'admin.uji-saring*', 'admin.lokasi*')],
+            ['Pendonor', route('admin.pendonor'), request()->routeIs('admin.pendonor*')],
+            ['Kegiatan Donor', route('admin.kegiatan'), request()->routeIs('admin.kegiatan*')],
         ],
         $user->hasRole('petugas_rs') => [
             ['Dashboard', route('petugas.dashboard'), request()->routeIs('petugas.dashboard')],
-            ['Stok Darah', '#', false],
-            ['Permintaan Darah', '#', false],
         ],
         default => [
             ['Dashboard', route('pendonor.dashboard'), request()->routeIs('pendonor.dashboard')],
-            ['Jadwal Donor', '#', false],
-            ['Riwayat Donor', '#', false],
-            ['E-Kartu Donor', '#', false],
+            ['Jadwal Donor', route('pendonor.kegiatan'), request()->routeIs('pendonor.kegiatan*')],
+            ['Riwayat Donor', route('pendonor.riwayat'), request()->routeIs('pendonor.riwayat')],
+            ['Profil', route('pendonor.profil'), request()->routeIs('pendonor.profil*')],
         ],
     };
+
 @endphp
 
 <header class="bg-red-700 text-white">
@@ -71,12 +66,8 @@
             @endforeach
         </nav>
 
-        {{-- Kanan: notifikasi + akun --}}
+        {{-- Kanan: akun --}}
         <div class="flex items-center gap-3">
-            <button type="button" class="p-2 rounded-full hover:bg-white/10" aria-label="Notifikasi">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>
-            </button>
-
             <details class="relative">
                 <summary class="list-none cursor-pointer flex items-center gap-2 rounded-xl bg-red-900/50 border border-white/20 px-3 py-2 text-sm hover:bg-red-900/70">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-3.3 0-8 1.7-8 5v1h16v-1c0-3.3-4.7-5-8-5z"/></svg>
@@ -91,6 +82,7 @@
                     @role('admin_pmi')
                         <a href="{{ route('users.index') }}" class="block px-4 py-3 text-sm hover:bg-gray-50">Kelola Akun</a>
                         <a href="{{ route('instansi.index') }}" class="block px-4 py-3 text-sm hover:bg-gray-50">Data Instansi</a>
+                        <a href="{{ route('admin.batas-minimum') }}" class="block px-4 py-3 text-sm hover:bg-gray-50">Batas Minimum Stok</a>
                     @endrole
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -103,6 +95,9 @@
 </header>
 
 <main class="max-w-6xl mx-auto p-4 sm:p-6">
+    @if (session('warning') && ! request()->routeIs('admin.pendonor.show'))
+        <div class="mb-4 rounded bg-amber-50 border border-amber-300 text-amber-800 text-sm p-3">{{ session('warning') }}</div>
+    @endif
     @if (session('success'))
         <div class="mb-4 rounded bg-green-50 border border-green-200 text-green-700 text-sm p-3">{{ session('success') }}</div>
     @endif
@@ -113,5 +108,6 @@
     @endif
     @yield('content')
 </main>
+@stack('scripts')
 </body>
 </html>

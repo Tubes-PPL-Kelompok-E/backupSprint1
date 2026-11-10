@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('golongan', ['A', 'B', 'AB', 'O']);
             $table->enum('rhesus', ['pos', 'neg']);
             $table->date('tanggal_kedaluwarsa');
-            $table->enum('status', ['karantina', 'ready', 'reserved', 'ditahan', 'dimusnahkan'])->default('karantina');
+            $table->enum('status', ['karantina', 'ready', 'ditahan', 'kedaluwarsa', 'dimusnahkan'])->default('karantina');
             $table->string('lokasi_simpan')->nullable();
 
             // Hasil uji saring dan berita acara

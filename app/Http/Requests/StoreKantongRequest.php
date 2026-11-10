@@ -2,8 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Models\KantongDarah;
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
+/** Dipakai untuk kantong baru (store) maupun mengubah kantong berstatus Karantina (update). */
 class StoreKantongRequest extends FormRequest
 {
     public function authorize(): bool
@@ -19,9 +23,16 @@ class StoreKantongRequest extends FormRequest
 
     public function rules(): array
     {
+        $ini = $this->route('kantong'); // terisi saat update
+
         return [
-            'kode_batch'    => ['nullable', 'regex:/^[A-Z0-9\-]{5,40}$/', 'unique:kantong_darah,kode_batch'],
-            'tanggal_donor' => ['required', 'date', 'before_or_equal:today'],
+            'kode_batch'    => ['nullable', 'regex:/^[A-Z0-9\-]{5,40}$/', Rule::unique('kantong_darah', 'kode_batch')->ignore($ini?->id)],
+            'tanggal_donor' => ['bail', 'required', 'date', 'before_or_equal:today', function ($attribute, $value, $fail) {
+                $masa = KantongDarah::MASA_SIMPAN[$this->input('komponen')] ?? null;
+                if ($masa && Carbon::parse($value)->addDays($masa)->lt(today())) {
+                    $fail("Kantong sudah melewati masa simpan {$masa} hari sejak tanggal donor dan tidak dapat diterima.");
+                }
+            }],
             'volume_ml'     => ['required', 'integer', 'min:50', 'max:1000'],
             'komponen'      => ['required', 'in:prc,wb,tc,ffp'],
             'golongan'      => ['required', 'in:A,B,AB,O'],

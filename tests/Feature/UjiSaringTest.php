@@ -19,6 +19,7 @@ class UjiSaringTest extends TestCase
         parent::setUp();
         Storage::fake('local');
         $this->seed(RoleSeeder::class);
+        $this->seed(\Database\Seeders\LokasiSeeder::class);
 
         $admin = User::create(['name' => 'Admin', 'email' => 'admin@test.id', 'instansi' => 'PMI', 'password' => 'password123']);
         $admin->assignRole('admin_pmi');
