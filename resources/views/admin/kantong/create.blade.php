@@ -1,20 +1,22 @@
 @extends('layouts.app')
 @section('content')
 @php
+    $edit = isset($kantong);
     $in = 'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500';
     $radio = 'block rounded-lg border border-gray-200 bg-white py-3 text-center text-xs font-semibold text-gray-600 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-600';
 @endphp
 
 <div class="flex flex-wrap items-start justify-between gap-3 mb-5">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900">Input Kantong Darah Masuk</h1>
-        <p class="text-xs text-blue-600 mt-1">Catat kantong hasil donasi. Kantong baru berstatus Karantina sampai lolos uji saring.</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ $edit ? 'Ubah Kantong Darah' : 'Input Kantong Darah Masuk' }}</h1>
+        <p class="text-xs text-blue-600 mt-1">{{ $edit ? 'Koreksi data kantong yang masih berstatus Karantina.' : 'Catat kantong hasil donasi. Kantong baru berstatus Karantina sampai lolos uji saring.' }}</p>
     </div>
     <a href="{{ route('admin.stok') }}" class="rounded-lg border border-gray-200 bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-700">Kembali ke Stok Darah</a>
 </div>
 
-<form method="POST" action="{{ route('admin.kantong.store') }}" class="grid gap-4 lg:grid-cols-3">
+<form method="POST" action="{{ $edit ? route('admin.kantong.update', $kantong) : route('admin.kantong.store') }}" class="grid gap-4 lg:grid-cols-3">
     @csrf
+    @if ($edit) @method('PUT') @endif
     <div class="space-y-4 lg:col-span-2">
         <section class="rounded-xl border border-gray-200 bg-white p-5 space-y-4">
             <h2 class="text-[11px] font-bold tracking-wide text-gray-700">1. IDENTITAS KANTONG</h2>
@@ -27,23 +29,23 @@
 
             <div>
                 <label class="block text-xs font-semibold mb-1" for="kode_batch">Kode batch</label>
-                <input id="kode_batch" name="kode_batch" value="{{ old('kode_batch') }}" class="{{ $in }} uppercase" autocomplete="off">
+                <input id="kode_batch" name="kode_batch" value="{{ old('kode_batch', $kantong->kode_batch ?? '') }}" class="{{ $in }} uppercase" autocomplete="off">
                 <p class="mt-1 text-[11px] text-gray-400">Harus unik. Terisi otomatis dari tanggal donor dan golongan, boleh diubah.</p>
             </div>
             <div>
                 <label class="block text-xs font-semibold mb-1" for="tanggal_donor">Tanggal donor</label>
-                <input id="tanggal_donor" type="date" name="tanggal_donor" max="{{ now()->toDateString() }}" value="{{ old('tanggal_donor', now()->toDateString()) }}" class="{{ $in }}">
+                <input id="tanggal_donor" type="date" name="tanggal_donor" max="{{ now()->toDateString() }}" value="{{ old('tanggal_donor', $edit ? $kantong->tanggal_donor->toDateString() : now()->toDateString()) }}" class="{{ $in }}">
                 <p class="mt-1 text-[11px] text-gray-400">Tidak boleh tanggal di masa depan.</p>
             </div>
             <div>
                 <label class="block text-xs font-semibold mb-1" for="volume_ml">Volume (ml)</label>
-                <input id="volume_ml" type="number" name="volume_ml" min="50" max="1000" value="{{ old('volume_ml', 350) }}" class="{{ $in }}">
+                <input id="volume_ml" type="number" name="volume_ml" min="50" max="1000" value="{{ old('volume_ml', $kantong->volume_ml ?? 350) }}" class="{{ $in }}">
             </div>
             <div>
                 <label class="block text-xs font-semibold mb-1" for="komponen">Komponen</label>
                 <select id="komponen" name="komponen" class="{{ $in }}">
                     @foreach (\App\Models\KantongDarah::KOMPONEN as $v => $l)
-                        <option value="{{ $v }}" @selected(old('komponen', 'prc') === $v)>{{ $l }}</option>
+                        <option value="{{ $v }}" @selected(old('komponen', $kantong->komponen ?? 'prc') === $v)>{{ $l }}</option>
                     @endforeach
                 </select>
             </div>
@@ -56,7 +58,7 @@
                     <p class="text-xs font-semibold mb-2">Golongan</p>
                     <div class="grid grid-cols-4 gap-2">
                         @foreach (['A', 'B', 'AB', 'O'] as $g)
-                            <label class="cursor-pointer"><input type="radio" name="golongan" value="{{ $g }}" class="peer sr-only" @checked(old('golongan', 'A') === $g)><span class="{{ $radio }}">{{ $g }}</span></label>
+                            <label class="cursor-pointer"><input type="radio" name="golongan" value="{{ $g }}" class="peer sr-only" @checked(old('golongan', $kantong->golongan ?? 'A') === $g)><span class="{{ $radio }}">{{ $g }}</span></label>
                         @endforeach
                     </div>
                 </div>
@@ -64,15 +66,17 @@
                     <p class="text-xs font-semibold mb-2">Rhesus</p>
                     <div class="grid grid-cols-2 gap-2">
                         @foreach (['pos' => 'Positif (+)', 'neg' => 'Negatif (-)'] as $v => $l)
-                            <label class="cursor-pointer"><input type="radio" name="rhesus" value="{{ $v }}" class="peer sr-only" @checked(old('rhesus', 'pos') === $v)><span class="{{ $radio }}">{{ $l }}</span></label>
+                            <label class="cursor-pointer"><input type="radio" name="rhesus" value="{{ $v }}" class="peer sr-only" @checked(old('rhesus', $kantong->rhesus ?? 'pos') === $v)><span class="{{ $radio }}">{{ $l }}</span></label>
                         @endforeach
                     </div>
                 </div>
             </div>
             <div class="mt-6 flex flex-wrap justify-end gap-2">
                 <a href="{{ route('admin.stok') }}" class="rounded-lg border border-gray-300 px-4 py-2 text-xs font-semibold text-gray-700">Batal</a>
-                <button name="tambah_lagi" value="1" class="rounded-lg bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-700">Simpan dan Tambah Lagi</button>
-                <button class="rounded-lg bg-red-600 px-5 py-2 text-xs font-semibold text-white hover:bg-red-700">&#10003; Simpan Kantong</button>
+                @unless ($edit)
+                    <button name="tambah_lagi" value="1" class="rounded-lg bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-700">Simpan dan Tambah Lagi</button>
+                @endunless
+                <button class="rounded-lg bg-red-600 px-5 py-2 text-xs font-semibold text-white hover:bg-red-700">&#10003; {{ $edit ? 'Simpan Perubahan' : 'Simpan Kantong' }}</button>
             </div>
         </section>
     </div>
@@ -113,7 +117,8 @@
     const $ = id => document.getElementById(id);
     const MASA = @json(\App\Models\KantongDarah::MASA_SIMPAN);
     const URL_CEK = @json(route('admin.kantong.cek'));
-    let kodeManual = {{ old('kode_batch') ? 'true' : 'false' }};
+    let kodeManual = {{ old('kode_batch', $kantong->kode_batch ?? '') !== '' ? 'true' : 'false' }};
+    const KECUALI = @json($kantong->id ?? null);
 
     const gol = () => (document.querySelector('input[name=golongan]:checked') || {}).value;
     const tandai = (id, ok) => {
@@ -144,6 +149,7 @@
 
     async function cekKode() {
         const q = new URLSearchParams({kode: $('kode_batch').value, tanggal: $('tanggal_donor').value, golongan: gol() || ''});
+        if (KECUALI) q.set('kecuali', KECUALI);
         try {
             const r = await (await fetch(URL_CEK + '?' + q)).json();
             if (!kodeManual && r.saran) { $('kode_batch').value = r.saran; return cekKode(); }

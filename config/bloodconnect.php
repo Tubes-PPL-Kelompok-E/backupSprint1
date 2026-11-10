@@ -5,19 +5,33 @@ return [
     |--------------------------------------------------------------------------
     | Kode Registrasi Admin PMI
     |--------------------------------------------------------------------------
-    | Kode rahasia yang diminta saat mendaftar lewat tab "Admin PMI".
-    |
-    | - Isi ADMIN_REGISTER_CODE di file .env untuk memakai kode sendiri (disarankan).
-    | - Jika .env kosong dan APP_ENV=local, dipakai kode bawaan "PMI-ADMIN-2026"
-    |   supaya mudah diuji di komputer sendiri.
-    | - Di luar lokal (production) tanpa ADMIN_REGISTER_CODE, registrasi admin dinonaktifkan.
-    */
+
     'admin_register_code' => env(
         'ADMIN_REGISTER_CODE',
         env('APP_ENV') === 'local' ? 'PMI-ADMIN-2026' : null
-    ),
-    /*| Kode rahasia untuk mendaftar sebagai Admin PMI lewat halaman registrasi.
-    | Isi ADMIN_REGISTER_CODE di file .env. Jika kosong, registrasi Admin PMI dinonaktifkan.
+    )
+
+    /*
+    |--------------------------------------------------------------------------
+    | Parameter stok & peringatan
+    |--------------------------------------------------------------------------
     */
-    'admin_register_code' => env('ADMIN_REGISTER_CODE'),
+
+
+
+    'ambang_kedaluwarsa_hari' => (int) env('AMBANG_KEDALUWARSA_HARI', 7),
+
+    'interval_donor_hari' => (int) env('INTERVAL_DONOR_HARI', 60),
+
+    'pemeriksaan' => [
+        'hb_min' => 12.5, 'hb_maks' => 17.0,
+        'sistolik_min' => 90, 'sistolik_maks' => 160,
+        'diastolik_min' => 60, 'diastolik_maks' => 100,
+        'berat_min' => 45.0,
+        'suhu_maks' => 37.5,
+        'nadi_min' => 50, 'nadi_maks' => 100,
+        'umur_min' => 17, 'umur_maks' => 65,
+    ],
+
+    'polling_detik' => 30,
 ];

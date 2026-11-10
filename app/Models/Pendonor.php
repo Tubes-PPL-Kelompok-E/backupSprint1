@@ -2,96 +2,99 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pendonor extends Model
 {
-    use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'pendonor';
 
     protected $fillable = [
-        'user_id',
-        'kode_pendonor',
-        'nik',
-        'nama',
-        'tanggal_lahir',
-        'jenis_kelamin',
-        'golongan_darah',
-        'rhesus',
-        'telepon',
-        'kota',
-        'alamat',
-        'tanggal_terakhir_donor',
-        'status_kelayakan',
+        'user_id', 'kode_donor', 'nama', 'tanggal_lahir', 'jenis_kelamin',
+        'golongan', 'rhesus', 'no_hp', 'kota', 'alamat',
     ];
 
     protected function casts(): array
     {
-        return [
-            'tanggal_lahir' => 'date',
-            'tanggal_terakhir_donor' => 'date',
-        ];
+        return ['tanggal_lahir' => 'date'];
     }
 
-    /**
-     * Akun user pendonor (opsional jika pendonor mendaftar web)
-     */
+    /** Kode otomatis: D-000001, D-000002, ... */
+    public static function generateKode(): string
+    {
+        $terakhir = static::withTrashed()->where('kode_donor', 'like', 'D-%')->orderByDesc('kode_donor')->value('kode_donor');
+        $nomor = $terakhir ? ((int) substr($terakhir, 2)) + 1 : 1;
+
+        return sprintf('D-%06d', $nomor);
+    }
+
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
-    /**
-     * Riwayat pendaftaran kegiatan mobile unit
-     */
-    public function pendaftaranKegiatan(): HasMany
-    {
-        return $this->hasMany(PendaftaranKegiatan::class, 'pendonor_id');
-    }
-
-    /**
-     * Riwayat donasi darah
-     */
     public function donasi(): HasMany
     {
-        return $this->hasMany(Donasi::class, 'pendonor_id');
+        return $this->hasMany(Donasi::class)->orderByDesc('tanggal_donor')->orderByDesc('id');
     }
 
-    /**
-     * Riwayat panggilan donor darurat / matching alert
-     */
-    public function panggilan(): HasMany
+    public function pendaftaran(): HasMany
     {
-        return $this->hasMany(PanggilanPendonor::class, 'pendonor_id');
+        return $this->hasMany(PendaftaranKegiatan::class);
     }
 
-    /**
-     * Scope pendonor layak donor
-     */
-    public function scopeLayak(Builder $query): Builder
+    public function pemeriksaan(): HasMany
     {
-        return $query->where('status_kelayakan', 'Layak');
+        return $this->hasMany(PemeriksaanDonor::class)->orderByDesc('tanggal')->orderByDesc('id');
     }
 
-    /**
-     * Scope pencarian berdasarkan golongan darah & rhesus
-     */
-    public function scopeGolonganDarah(Builder $query, string $gol, string $rhesus = '+'): Builder
+    public function umur(?Carbon $pada = null): int
     {
-        return $query->where('golongan_darah', $gol)->where('rhesus', $rhesus);
+        return (int) $this->tanggal_lahir->diffInYears($pada ?? today());
     }
 
-    /**
-     * Format golongan darah lengkap misal "O+"
-     */
-    public function getGolonganDarahLengkapAttribute(): string
+    public function golonganLengkap(): string
     {
-        return "{$this->golongan_darah}{$this->rhesus}";
+        return $this->golongan . ' (' . ($this->rhesus === 'pos' ? '+' : '-') . ')';
+    }
+
+    public function tanggalDonorTerakhir(): ?Carbon
+    {
+        $tgl = $this->donasi()->reorder()->max('tanggal_donor');
+
+        return $tgl ? Carbon::parse($tgl) : null;
+    }
+
+    /** Tanggal paling awal pendonor boleh mendonor lagi; null = boleh kapan saja (belum pernah donor). */
+    public function tanggalLayak(): ?Carbon
+    {
+        return $this->tanggalDonorTerakhir()?->addDays(config('bloodconnect.interval_donor_hari'));
+    }
+
+    /** Layak pada tanggal tertentu (default hari ini). */
+    public function layakPada(?Carbon $tanggal = null): bool
+    {
+        $layak = $this->tanggalLayak();
+
+        return $layak === null || ($tanggal ?? today())->startOfDay()->greaterThanOrEqualTo($layak->startOfDay());
+    }
+
+    public function scopeCocok(Builder $query, string $golongan, string $rhesus): Builder
+    {
+        return $query->where('golongan', $golongan)->where('rhesus', $rhesus);
+    }
+
+    public function scopeCari(Builder $query, ?string $kata): Builder
+    {
+        return $query->when($kata, fn ($q) => $q->where(fn ($w) => $w
+            ->whereLike('nama', "%{$kata}%")
+            ->orWhereLike('kode_donor', "%{$kata}%")
+            ->orWhereLike('kota', "%{$kata}%")));
     }
 }
-

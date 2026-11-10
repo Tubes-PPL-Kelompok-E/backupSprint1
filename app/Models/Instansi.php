@@ -32,8 +32,8 @@ class Instansi extends Model
     public function scopeCari(Builder $query, ?string $kata): Builder
     {
         return $query->when($kata, fn ($q) => $q->where(fn ($w) => $w
-            ->where('kode', 'like', "%{$kata}%")
-            ->orWhere('nama', 'like', "%{$kata}%")
-            ->orWhere('kota', 'like', "%{$kata}%")));
+            ->whereLike('kode', "%{$kata}%")
+            ->orWhereLike('nama', "%{$kata}%")
+            ->orWhereLike('kota', "%{$kata}%")));
     }
 }

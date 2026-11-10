@@ -16,8 +16,8 @@ class UserController extends Controller
         $users = User::withTrashed()
             ->with('roles')
             ->when($request->q, fn ($q, $s) => $q->where(fn ($w) => $w
-                ->where('name', 'like', "%{$s}%")
-                ->orWhere('email', 'like', "%{$s}%")))
+                ->whereLike('name', "%{$s}%")
+                ->orWhereLike('email', "%{$s}%")))
             ->when($request->role, fn ($q, $r) => $q->role($r))
             ->when($request->instansi, fn ($q, $i) => $q->where('instansi', $i))
             ->latest()
