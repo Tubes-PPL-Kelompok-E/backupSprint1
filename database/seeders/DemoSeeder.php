@@ -11,10 +11,7 @@ use App\Models\Pendonor;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-/**
- * Data contoh untuk demo/uji manual. Aman dijalankan ulang: berhenti bila sudah ada data kantong.
- * Tanggal dibuat relatif terhadap hari ini supaya dashboard selalu terisi (ada yang segera kedaluwarsa, dsb).
- */
+
 class DemoSeeder extends Seeder
 {
     public function run(): void
@@ -23,7 +20,7 @@ class DemoSeeder extends Seeder
             return;
         }
 
-        mt_srand(2026); // hasil acak selalu sama agar demo konsisten
+        mt_srand(2026);
 
         $admin = User::where('email', 'admin.pmi@bloodconnect.id')->first();
         $this->seedPendonor();
@@ -33,20 +30,19 @@ class DemoSeeder extends Seeder
 
     private function seedPendonor(): void
     {
-        // [nama, L/P, golongan, rhesus, kota, hari sejak donasi terakhir (null = belum pernah)]
         $data = [
             ['Pendonor Contoh',     'L', 'O',  'pos', 'Jakarta Pusat',    120],
-            ['Siti Rahmawati',      'P', 'O',  'pos', 'Jakarta Pusat',    10],   // belum layak (jeda 60 hari)
-            ['Budi Santoso',        'L', 'O',  'pos', 'Jakarta Pusat',    75],
-            ['Dewi Anggraini',      'P', 'A',  'pos', 'Jakarta Pusat',    90],
-            ['Rizky Pratama',       'L', 'B',  'pos', 'Jakarta Selatan',  200],
+            ['Lutfiyah Hidayat',    'P', 'O',  'pos', 'Jakarta Pusat',    10],   // belum layak (jeda 60 hari)
+            ['Rafli Ilham',         'L', 'O',  'pos', 'Jakarta barat',    75],
+            ['Aqila Karimah',       'P', 'A',  'pos', 'Jakarta Pusat',    90],
+            ['Ilham Fahrozi',       'L', 'B',  'pos', 'Jakarta Selatan',  200],
             ['Muhammad Subhan',     'L', 'AB', 'pos', 'Jakarta Pusat',    null],
-            ['Nadia Putri',         'P', 'AB', 'pos', 'Jakarta Pusat',    130],
-            ['Agus Hermawan',       'L', 'O',  'neg', 'Jakarta Pusat',    100],
-            ['Lestari Wulandari',   'P', 'B',  'neg', 'Jakarta Timur',    80],
-            ['Fajar Nugraha',       'L', 'A',  'neg', 'Bandung',          150],
-            ['Maya Sari',           'P', 'O',  'pos', 'Bekasi',           95],
-            ['Hendra Gunawan',      'L', 'AB', 'neg', 'Jakarta Pusat',    62],
+            ['Kartika Putri',       'P', 'AB', 'pos', 'Jakarta Pusat',    130],
+            ['Agus Rozi',           'L', 'O',  'neg', 'Jakarta Pusat',    100],
+            ['Dhafin Lestari',      'P', 'B',  'neg', 'Jakarta Timur',    80],
+            ['Harjuno Juno',        'L', 'A',  'neg', 'Bandung',          150],
+            ['Maya Padasari',       'P', 'O',  'pos', 'Bekasi',           95],
+            ['Sumber Alam',         'L', 'AB', 'neg', 'Jakarta Pusat',    62],
         ];
 
         foreach ($data as $i => [$nama, $jk, $gol, $rh, $kota, $hari]) {
