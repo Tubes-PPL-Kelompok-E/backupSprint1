@@ -58,7 +58,7 @@
                 <td class="p-4">{{ $k->tanggal_kedaluwarsa->format('d-m-Y') }}</td>
                 <td class="p-4">
                     @if ($musnah) <span class="text-gray-400">-</span>
-                    @elseif ($sisa < 0) <span class="rounded bg-red-600 px-2 py-1 font-bold text-white">KADALUWARSA</span>
+                    @elseif ($sisa < 0) <span class="rounded bg-red-600 px-2 py-1 font-bold text-white">KEDALUWARSA</span>
                     @elseif ($sisa <= 7) <span class="rounded border border-red-300 bg-red-50 px-2 py-1 font-bold text-red-600">{{ $sisa }} Hari Lagi</span>
                     @else <span class="rounded bg-gray-100 px-2 py-1 font-semibold text-gray-700">{{ $sisa }} Hari</span>
                     @endif

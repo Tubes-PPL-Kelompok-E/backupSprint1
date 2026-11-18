@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
+/**
+ * @extends Factory<User>
+ */
 class UserFactory extends Factory
 {
-
+    /**
+     * The current password being used by the factory.
+     */
     protected static ?string $password;
 
     /**
@@ -27,6 +32,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
         ];
     }
+
 
     public function unverified(): static
     {

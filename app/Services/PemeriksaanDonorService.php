@@ -7,7 +7,6 @@ use App\Models\PemeriksaanDonor;
 use App\Models\Pendonor;
 use App\Models\User;
 
-
 class PemeriksaanDonorService
 {
     /** @return array{hasil:string,alasan:string[]} */

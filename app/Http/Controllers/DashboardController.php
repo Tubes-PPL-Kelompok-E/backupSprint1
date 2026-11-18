@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Services\StokService;
 use Illuminate\Http\Request;
 
+/**
+ * Dashboard stok darah. Halaman dimuat sekali, lalu data diperbarui otomatis
+ * tiap 30 detik lewat endpoint JSON (polling).
+ */
 class DashboardController extends Controller
 {
     public function __construct(private StokService $stok)
     {
     }
 
+    /** Dashboard Petugas Bank Darah (UTD PMI): kartu ringkasan, grafik stok, FEFO Alert. */
     public function admin(Request $request)
     {
         return view('admin.dashboard', [
@@ -19,8 +24,10 @@ class DashboardController extends Controller
         ]);
     }
 
+    /** Dashboard Admin RS: tampilan stok baca-saja. */
     public function rs(Request $request)
     {
+        // Katalog stok PMI per golongan (semua rhesus)
         $perKombinasi = $this->stok->stokSiapPerKombinasi();
         $katalog = [];
         foreach (['A', 'B', 'AB', 'O'] as $g) {
@@ -39,6 +46,7 @@ class DashboardController extends Controller
         ]);
     }
 
+    /** Endpoint polling 30 detik (Admin PMI dan Admin RS). */
     public function data(Request $request)
     {
         return response()->json($this->stok->dashboard($request->query('komponen')));

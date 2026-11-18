@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
+/** Kelola data pendonor, riwayat donasi, dan pemeriksaan pra-donor. */
 class PendonorController extends Controller
 {
     public function index(Request $request)
@@ -82,10 +83,12 @@ class PendonorController extends Controller
         return redirect()->route('admin.pendonor')->with('success', 'Pendonor dinonaktifkan.');
     }
 
+    /** Catat donasi (riwayat); menentukan kelayakan donor berikutnya. */
     public function catatDonasi(Request $request, Pendonor $pendonor)
     {
         $data = $this->validasiDonasi($request);
 
+        // pemeriksaan hari ini yang menyatakan tidak layak menghalangi pencatatan donasi.
         $periksaHariIni = $pendonor->pemeriksaan()->whereDate('tanggal', today())->first();
         if ($periksaHariIni && ! $periksaHariIni->layak()) {
             return back()->withErrors(['donasi' => 'Pemeriksaan pra-donor hari ini menyatakan pendonor TIDAK LAYAK. Donasi tidak dapat dicatat.']);

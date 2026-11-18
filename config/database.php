@@ -4,7 +4,9 @@ use Illuminate\Support\Str;
 use Pdo\Mysql;
 
 return [
+
     'default' => env('DB_CONNECTION', 'pgsql'),
+
     'connections' => [
 
         'sqlite' => [
@@ -91,12 +93,18 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Migration Repository Table
+    |--------------------------------------------------------------------------
+    */
+
     'migrations' => [
         'table' => 'migrations',
         'update_date_on_publish' => true,
     ],
 
-    'redis' => [
+        'redis' => [
 
         'client' => env('REDIS_CLIENT', 'phpredis'),
 

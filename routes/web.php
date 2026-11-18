@@ -31,7 +31,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'show'])->name('register');
     Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:5,1')->name('register.store');
 
-    // Lupa kata sandi 
+    // Lupa kata sandi (nama route 'password.reset' wajib untuk email bawaan Laravel)
     Route::get('/forgot-password', [ForgotPasswordController::class, 'show'])->name('password.request');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'send'])->middleware('throttle:5,1')->name('password.email');
     Route::get('/reset-password/{token}', [ResetPasswordController::class, 'show'])->name('password.reset');
@@ -41,16 +41,16 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
-    // Data dashboard 
+    // Data dashboard untuk polling 30 detik (Petugas Bank Darah dan Admin RS)
     Route::get('/dashboard/data', [DashboardController::class, 'data'])
         ->middleware('role:admin_pmi|petugas_rs')->name('dashboard.data');
 });
 
-// Admin RS
+// Portal Admin RS
 Route::get('/petugas/dashboard', [DashboardController::class, 'rs'])
     ->middleware(['auth', 'role:petugas_rs'])->name('petugas.dashboard');
 
-// Pendonor
+// Portal Pendonor
 Route::middleware(['auth', 'role:pendonor'])->prefix('pendonor')->group(function () {
     Route::get('dashboard', [PendonorDashboardController::class, 'index'])->name('pendonor.dashboard');
     Route::get('riwayat', [PendonorDashboardController::class, 'riwayat'])->name('pendonor.riwayat');
@@ -61,7 +61,7 @@ Route::middleware(['auth', 'role:pendonor'])->prefix('pendonor')->group(function
     Route::put('profil', [PendonorProfilController::class, 'update'])->name('pendonor.profil.update');
 });
 
-// Admin PMI (Petugas Bank Darah)
+// Portal Admin PMI (Petugas Bank Darah)
 Route::middleware(['auth', 'role:admin_pmi'])->prefix('admin')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::get('batas-minimum', [BatasMinimumController::class, 'index'])->name('admin.batas-minimum');

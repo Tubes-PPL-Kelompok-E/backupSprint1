@@ -19,6 +19,12 @@ AKUN = {
 }
 WAIT = 10
 
+# Selektor tanpa atribut khusus, jadi aplikasi tidak perlu diubah.
+# Pesan flash di layout berada langsung di dalam <main>; di halaman login/register berada di dalam <form>.
+TOMBOL_SUBMIT_LOGIN = "form button:not([type='button'])"
+FLASH_SUKSES = "main > div.bg-green-50.border, form div.bg-green-50.border"
+FLASH_GALAT = "main > div.bg-red-50.border, form div.bg-red-50.border"
+
 
 def unik(awal=""):
     """Akhiran acak supaya data tiap kali tes dijalankan tidak bentrok."""
@@ -36,37 +42,22 @@ def buka(driver, path):
 def masuk(driver, kunci="admin_pmi"):
     """Login lewat halaman login. kunci: salah satu kunci AKUN. Sesi sebelumnya dibersihkan."""
     driver.delete_all_cookies()
+    peran = "pendonor" if kunci.startswith("pendonor") else kunci
     buka(driver, "/login")
-    
-    # Tentukan teks tombol peran sesuai dengan tampilan halaman login
-    if kunci == "petugas_rs":
-        teks_peran = "Petugas RS"
-    elif kunci.startswith("pendonor"):
-        teks_peran = "Pendonor"
-    else:
-        teks_peran = "Admin PMI"
-    
-    # Klik tombol pilihan peran berdasarkan teksnya di halaman
-    peran_btn = WebDriverWait(driver, WAIT).until(
-        EC.element_to_be_clickable((By.XPATH, f"//button[contains(normalize-space(.), '{teks_peran}')]"))
-    )
-    peran_btn.click()
-    
-    # Isi form email dan password
-    driver.find_element(By.NAME, "email").clear()
+    WebDriverWait(driver, WAIT).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, f"[data-role='{peran}']"))
+    ).click()
     driver.find_element(By.NAME, "email").send_keys(AKUN[kunci])
-    
-    driver.find_element(By.NAME, "password").clear()
     driver.find_element(By.NAME, "password").send_keys(PASSWORD)
-    
-    # Klik tombol "Masuk ke Portal BloodConnect" berdasarkan teks tombol
-    submit_btn = WebDriverWait(driver, WAIT).until(
-        EC.element_to_be_clickable((By.XPATH, "//button[contains(normalize-space(.), 'Masuk ke Portal BloodConnect')]"))
-    )
-    submit_btn.click()
-    
-    # Tunggu sampai berhasil masuk (URL berubah dari /login)
-    WebDriverWait(driver, WAIT).until(lambda d: "/login" not in d.current_url)
+    driver.find_element(By.CSS_SELECTOR, TOMBOL_SUBMIT_LOGIN).click()
+    try:
+        WebDriverWait(driver, WAIT).until(lambda d: "/login" not in d.current_url)
+    except TimeoutException:
+        pesan = " ".join(e.text for e in driver.find_elements(By.CSS_SELECTOR, FLASH_GALAT))
+        raise AssertionError(
+            f"Login sebagai {kunci} gagal ({AKUN[kunci]}). Pesan halaman: {pesan or '(tidak ada)'}. "
+            "Pastikan database terisi (php artisan migrate:fresh --seed)."
+        )
 
 
 def isi(driver, name, nilai, konteks=None):
@@ -96,7 +87,7 @@ def radio(driver, name, value):
 
 def klik(driver, el):
     """Klik elemen setelah membuang pesan flash di halaman lama, supaya sukses()/galat() hanya membaca pesan dari halaman baru."""
-    driver.execute_script("document.querySelectorAll('[data-testid^=\"flash-\"]').forEach(e => e.remove());")
+    driver.execute_script("document.querySelectorAll(arguments[0]).forEach(e => e.remove());", FLASH_SUKSES + ", " + FLASH_GALAT)
     el.click()
 
 
@@ -149,21 +140,17 @@ def teks_halaman(driver, teks):
 
 def sukses(driver):
     try:
-        el = WebDriverWait(driver, WAIT).until(
-            EC.visibility_of_element_located((By.CSS_SELECTOR, "[data-testid='flash-success'], .alert-success, .bg-green-500, .bg-emerald-500, [role='alert']"))
-        )
-        return el.text
-    except TimeoutException:
-        body_text = driver.find_element(By.TAG_NAME, "body").text
-        if any(keyword in body_text for keyword in ["berhasil", "dikembalikan", "tersimpan", "sukses"]):
-            return "Berhasil (terdeteksi dari teks halaman)"
+        return WebDriverWait(driver, WAIT).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, FLASH_SUKSES))
+        ).text
+    except TimeoutException:  # sertakan isi halaman agar penyebab kegagalan terlihat di laporan
         raise AssertionError(f"Pesan sukses tidak muncul di {driver.current_url}. Isi halaman: "
-                             + body_text[:600])
+                             + driver.find_element(By.TAG_NAME, "body").text[:600])
 
 
 def galat(driver):
     return WebDriverWait(driver, WAIT).until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, "[data-testid='flash-error']"))
+        EC.visibility_of_element_located((By.CSS_SELECTOR, FLASH_GALAT))
     ).text
 
 
@@ -179,12 +166,17 @@ def baris(driver, teks):
     )
 
 
+# ---------- pembuat data lewat UI (dipakai tes PBI lain yang butuh data awal)
+
 def buat_kantong(driver, kode, tanggal_donor=None, komponen="prc", golongan="O", rhesus="pos", volume=350):
     buka(driver, "/admin/kantong-darah/create")
+    # Halaman mengisi saran kode batch lewat AJAX saat dibuka; tunggu dulu supaya tidak menimpa/bercampur dengan isian tes.
     WebDriverWait(driver, WAIT).until(
         lambda d: d.find_element(By.NAME, "kode_batch").get_attribute("value") != ""
     )
+    # Hitung request fetch yang masih berjalan, supaya form baru dikirim setelah pengecekan kode batch selesai
     pantau_ajax(driver)
+    # Kode batch diisi lewat JS (event input) tanpa clear(): clear() membuat halaman menganggap kode kosong dan menimpanya dengan saran.
     driver.execute_script(
         "const e = document.getElementsByName('kode_batch')[0]; e.value = arguments[0];"
         "e.dispatchEvent(new Event('input', {bubbles: true}));", kode,
@@ -212,6 +204,7 @@ def buat_kegiatan(driver, judul, tanggal=None, kuota=50):
 
 
 def id_kantong(driver, kode):
+    """Ambil id kantong dari tautan Ubah di daftar stok (cari dengan kode batch)."""
     buka(driver, f"/admin/stok-darah?q={kode}")
     href = baris(driver, kode).find_element(By.XPATH, ".//a[normalize-space()='Ubah']").get_attribute("href")
     return href.rstrip("/").split("/")[-2]

@@ -17,8 +17,17 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Debug Mode
+    |--------------------------------------------------------------------------
+    */
+
     'debug' => (bool) env('APP_DEBUG', false),
+
     'url' => env('APP_URL', 'http://localhost'),
+
     'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
 
     'locale' => env('APP_LOCALE', 'id'),
@@ -27,8 +36,11 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
-    #Encryption Key
-    
+    /*
+    |--------------------------------------------------------------------------
+    | Encryption Key
+    |--------------------------------------------------------------------------
+    */
 
     'cipher' => 'AES-256-CBC',
 
@@ -39,6 +51,12 @@ return [
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Maintenance Mode Driver
+    |--------------------------------------------------------------------------
+    */
 
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
